@@ -20,7 +20,7 @@ screen_height = 700
 last_fire = pygame.time.get_ticks()
 last_time = pygame.time.get_ticks()
 delay = 300
-birth_time = 1000
+birth_time = 3000
 
 
 # Creating a background object
