@@ -17,19 +17,39 @@ class background_screen:
         pygame.display.set_caption(caption)
 
     # Adding alien ships to the background of the screen.
-    def update_screen(self):
-        self.aliens.append(AlienShip(self))
+    def update_screen(self , alienImage , alienHeight , alienWidth):
+        curr_alien = AlienShip(self , alienImage , alienWidth , alienHeight )
+        self.aliens.append(curr_alien)
 
-    def move_aliens(self):
-        temp = []
+    def move_aliens(self , dt):
         for alien in self.aliens:
             # print(alien.x , alien.y)
-            alien.move()
-            if alien.y < self.screen_size[1]:
-                temp.append(alien)
-        self.aliens = temp
+            alien.move(dt)
+            if alien.y > self.screen_size[1]:
+                self.aliens.remove(alien)
+
 
     def draw_aliens(self):
         for alien in self.aliens:
             alien.draw()
 
+    def collide(self , alien , bullet):
+         if (bullet.rect.x >= alien.x) and (bullet.rect.x <= alien.x + alien.width):
+             if (alien.y + alien.height)>=bullet.rect.y:
+                 return True
+         return False
+
+    def play_gif(self , frames):
+        global current_frame
+        while running:
+            with lock:
+                current_frame = (current_frame + 1) % len(frames)  # Loop frames
+            time.sleep(1 / frame_rate)  # Adjust playback speed
+
+    def check_collision(self , bullets , frames):
+        for bullet in bullets:
+            for alien in self.aliens:
+                if self.collide(alien , bullet):
+                    self.explosion(alien , frames)
+                    bullets.remove(bullet)
+                    self.aliens.remove(alien)

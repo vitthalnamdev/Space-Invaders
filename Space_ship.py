@@ -10,9 +10,11 @@ class space_ship():
     def __init__(self , image , position , _size , _screen):
         self.image = pygame.image.load(image)
         self.image = pygame.transform.scale(self.image,_size)
+        self.width = _size[0]
+        self.height = _size[1]
         self.screen = _screen
         self.x, self.y = float(position[0]), float(position[1])  # Use float for smooth movement
-        self.vel_x = 0.5 # Velocity
+        self.vel_x = 500 # Velocity
         self.size = _size
         self.bullets = []
 
@@ -20,18 +22,18 @@ class space_ship():
         self.screen.blit(self.image , (self.x, self.y))
 
 
-    def move(self , key , obj_background:background.background_screen ):
+    def move(self , key , obj_background, dt):
         if key[pygame.K_LEFT]:
-             self.x -= self.vel_x
+             self.x -= (self.vel_x*dt)
              self.x = max(0.0 , self.x)
         elif key[pygame.K_RIGHT]:
-            self.x += self.vel_x
+            self.x += (self.vel_x*dt)
             self.x = min(self.x , obj_background.screen_size[0] - self.size[0])
 
-    def update_bullet(self):
+    def update_bullet(self , dt):
         for bullet in self.bullets:
-            bullet.update()
-            if bullet.rect.y<0:
+            bullet.update(dt)
+            if bullet.rect.y<-20:
                 self.bullets.remove(bullet)
 
     def draw_bullet(self):
@@ -40,9 +42,9 @@ class space_ship():
 
     def fire(self , key , obj_background , shoot_sound):
         if key[pygame.K_SPACE]:
-            self.bullets.append(bullet((self.x , self.y)))
-            shoot_sound.play(-1)
-        else:
-            shoot_sound.stop()
+            self.bullets.append(bullet(self))
+            shoot_sound.play()
+
+
 
 
