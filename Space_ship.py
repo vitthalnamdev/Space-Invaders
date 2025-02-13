@@ -10,6 +10,8 @@ class space_ship():
     def __init__(self , image , position , _size , _screen):
         self.image = pygame.image.load(image)
         self.image = pygame.transform.scale(self.image,_size)
+        self.mask = self.image.convert_alpha()
+        self.mask = pygame.mask.from_surface(self.mask)
         self.width = _size[0]
         self.height = _size[1]
         self.screen = _screen

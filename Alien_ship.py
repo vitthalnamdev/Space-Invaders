@@ -9,6 +9,8 @@ class AlienShip:
         self.width = alien_width
         self.height = alien_height
         self.image = alien_image
+        self.mask = self.image.convert_alpha()
+        self.mask = pygame.mask.from_surface(self.mask)
         self.y = 0
         self.x = np.random.uniform(low = self.width , high = background.screen_size[0] - self.width)
         self.speed = 80

@@ -20,10 +20,9 @@ pygame.mixer.init()
 info = pygame.display.Info()
 
 # Screen size
-# screen_width = info.current_w
-# screen_height = info.current_h
-screen_width =  800
-screen_height = 600
+screen_width = info.current_w
+screen_height = info.current_h
+
 
 # Creating time variables.
 last_fire = pygame.time.get_ticks()
@@ -60,6 +59,7 @@ alien_width = 50
 alien_height = 70
 alien_image = pygame.transform.scale(alien_image, (alien_width, alien_height))
 
+
 # Load background music
 pygame.mixer.music.load('space_music.mp3')  # Replace with your music file
 pygame.mixer.music.play(-1)  # Loop the music indefinitely
@@ -73,6 +73,9 @@ fire_time = 500
 prev_fire = pygame.time.get_ticks()
 
 
+# score count
+score = 0
+
 def reDrawing():
     # Redrawing the background.
     obj_background.set_image()
@@ -82,6 +85,7 @@ def reDrawing():
     obj_space_ship.draw()
     # Drawing the aliens.
     obj_background.draw_aliens()
+
 
 
 # Game Loop:
@@ -123,13 +127,16 @@ while running:
         last_fire = current_time
 
     # Updating the alien ships , and destroying the ships which have been destroyed by the space-ship fire.
-    obj_background.check_collision(bullets)
+    score = obj_background.check_collision(bullets , score)
 
     # Checking for gameOver.
     gameOver = False
+    gameOver = obj_background.game_over(obj_space_ship , bullets)
     if gameOver==True:
         bullets = []
-        obj_background.show_game_over()
+        obj_background.show_game_over(score)
+        prev_fire = current_time
+        last_fire = current_time
         gameOver = False
     # Redrawing everything.
     reDrawing()

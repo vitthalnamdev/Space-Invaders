@@ -48,6 +48,7 @@ class background_screen:
         for alien in self.aliens:
             curr = min(abs(alien.y - spaceship.y) , abs(alien.x - spaceship.x))
             if curr < mn:
+                mn = curr
                 index = cnt
             cnt = cnt + 1
         return index
@@ -57,7 +58,7 @@ class background_screen:
            return
        index = self.find(spaceship)
        curr_alien = self.aliens[index]
-       BULLET =  bullet.alien_bullet(curr_alien , 500 , 4 , 25)
+       BULLET =  bullet.alien_bullet(curr_alien)
        bullets.append(BULLET)
 
     def draw_aliens(self):
@@ -73,11 +74,13 @@ class background_screen:
          return False
 
 
-    def check_collision(self , bullets ):
+    def check_collision(self , bullets , score):
         for bullet in bullets:
             for alien in self.aliens:
                 if self.collide(alien , bullet):
+                    score += 1
                     self.aliens.remove(alien)
+        return score
 
     def safe(self , alien , spaceship):
         if alien.x > spaceship.x and alien.x < spaceship.x + spaceship.width:
@@ -88,9 +91,20 @@ class background_screen:
     def game_over(self , spaceship , bullets):
         # Checking for aliens:
         for alien in self.aliens:
-            if (self.safe(alien , spaceship)==False):
+            offset_x = alien.x - spaceship.x
+            offset_y = alien.y - spaceship.y
+            collision = spaceship.mask.overlap(alien.mask, (offset_x, offset_y))
+            if collision:
                 return True
 
+        for Bullet in bullets:
+            if isinstance(Bullet , bullet.bullet):
+                continue
+            offset_x = Bullet.rect.x - spaceship.x
+            offset_y = Bullet.rect.y - spaceship.y
+            collision = spaceship.mask.overlap(Bullet.mask, (offset_x, offset_y))
+            if collision:
+                return True
         return False
 
     def draw_text(self , text, color, x, y):
@@ -100,13 +114,14 @@ class background_screen:
         self.screen.blit(rendered_text, text_rect)
 
 
-    def show_game_over(self):
+
+    def show_game_over(self , score):
         while True:
             WHITE, BLACK, RED = (255, 255, 255), (0, 0, 0), (200, 0, 0)
             self.draw_text("GAME OVER", RED, self.screen_size[0]// 2, self.screen_size[1] // 3)
             self.draw_text("Press R to Restart", WHITE, self.screen_size[0] // 2, self.screen_size[1] // 2)
             self.draw_text("Press Q to Quit", WHITE, self.screen_size[0] // 2, self.screen_size[1] // 1.5)
-
+            self.draw_text(f"Score = {str(score)}" , WHITE , self.screen_size[0] // 2, self.screen_size[1] // 4.5)
             pygame.display.flip()
 
             # Handle user input

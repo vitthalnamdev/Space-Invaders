@@ -19,7 +19,7 @@ class bullet:
 
 
 class alien_bullet:
-    def __init__(self, ship, speed=100, width=1.3, height=40):
+    def __init__(self, ship, speed=400, width=2, height=30):
         self.width = width
         self.height = height
         self.correctness_factor = 8.5
@@ -27,6 +27,8 @@ class alien_bullet:
         self.y = float(ship.y) + ship.speed
         self.speed = speed
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.rect_surface = pygame.Surface((self.rect.width, self.rect.height))
+        self.mask = pygame.mask.from_surface(self.rect_surface)
 
     def update(self, dt):
         self.rect.y += (self.speed * dt)
