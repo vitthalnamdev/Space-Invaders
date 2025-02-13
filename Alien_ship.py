@@ -18,3 +18,6 @@ class AlienShip:
 
     def draw(self):
         self.screen.blit(self.image, (self.x, self.y))
+
+
+

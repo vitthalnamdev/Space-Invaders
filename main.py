@@ -20,8 +20,10 @@ pygame.mixer.init()
 info = pygame.display.Info()
 
 # Screen size
-screen_width = info.current_w
-screen_height = info.current_h
+# screen_width = info.current_w
+# screen_height = info.current_h
+screen_width =  800
+screen_height = 600
 
 # Creating time variables.
 last_fire = pygame.time.get_ticks()
@@ -65,26 +67,21 @@ pygame.mixer.music.set_volume(0.5)
 shoot_sound = pygame.mixer.Sound("laser_sound.mp3")
 shoot_sound.set_volume(0.1)
 
-
-# Load GIF and extract frames
-gif_path = 'blast.gif'  # Replace with your GIF file path
-gif = Image.open(gif_path)
-
-# Extract frames from GIF
-frames = []
-while True:
-    # Convert each frame to a Pygame surface
-    frame = pygame.image.fromstring(gif.tobytes(), gif.size, gif.mode)
-    frames.append(frame)
-    try:
-        gif.seek(gif.tell() + 1)  # Go to the next frame
-    except EOFError:
-        break  # If there are no more frames, stop
+# bullets:
+bullets = []
+fire_time = 500
+prev_fire = pygame.time.get_ticks()
 
 
-# threading variables
-lock = threading.Lock()
-
+def reDrawing():
+    # Redrawing the background.
+    obj_background.set_image()
+    # Redrawing the bullets.
+    obj_background.draw_bullet(bullets)
+    # Redrawing the space-ship.
+    obj_space_ship.draw()
+    # Drawing the aliens.
+    obj_background.draw_aliens()
 
 
 # Game Loop:
@@ -92,9 +89,8 @@ running = True
 pause = 0
 while running:
 
-
     # Update the bullets positions.
-    obj_space_ship.update_bullet(dt)
+    obj_background.update_bullet(dt , bullets)
 
     # Updating the aliens positions.
     obj_background.move_aliens(dt)
@@ -105,11 +101,15 @@ while running:
         obj_background.update_screen(alien_image , alien_width , alien_height)
         last_time = current_time
 
+    if current_time - prev_fire > fire_time:
+        obj_background.select_alien_to_fire(bullets , obj_space_ship)
+        prev_fire = current_time
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
             break
+
     # Capture the keys
     keys = pygame.key.get_pressed()
 
@@ -119,21 +119,20 @@ while running:
     # Fire bullets , after regular intervals when the fire button pressed.
     current_time = pygame.time.get_ticks()
     if current_time - last_fire > delay:
-        obj_space_ship.fire(keys , obj_background , shoot_sound)
+        obj_space_ship.fire(keys , obj_background , shoot_sound , bullets)
         last_fire = current_time
 
     # Updating the alien ships , and destroying the ships which have been destroyed by the space-ship fire.
-    obj_background.check_collision(obj_space_ship.bullets , frames)
+    obj_background.check_collision(bullets)
 
+    # Checking for gameOver.
+    gameOver = False
+    if gameOver==True:
+        bullets = []
+        obj_background.show_game_over()
+        gameOver = False
     # Redrawing everything.
-    # Redrawing the background.
-    obj_background.set_image()
-    # Redrawing the bullets.
-    obj_space_ship.draw_bullet()
-    # Redrawing the space-ship.
-    obj_space_ship.draw()
-    # Drawing the aliens.
-    obj_background.draw_aliens()
+    reDrawing()
     # Refresh screen
     pygame.display.flip()
     dt = clock.tick(60)/1000

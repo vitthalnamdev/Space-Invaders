@@ -16,7 +16,6 @@ class space_ship():
         self.x, self.y = float(position[0]), float(position[1])  # Use float for smooth movement
         self.vel_x = 500 # Velocity
         self.size = _size
-        self.bullets = []
 
     def draw(self):
         self.screen.blit(self.image , (self.x, self.y))
@@ -30,19 +29,10 @@ class space_ship():
             self.x += (self.vel_x*dt)
             self.x = min(self.x , obj_background.screen_size[0] - self.size[0])
 
-    def update_bullet(self , dt):
-        for bullet in self.bullets:
-            bullet.update(dt)
-            if bullet.rect.y<-20:
-                self.bullets.remove(bullet)
 
-    def draw_bullet(self):
-        for bullet in self.bullets:
-            bullet.draw(self.screen)
-
-    def fire(self , key , obj_background , shoot_sound):
+    def fire(self , key , obj_background , shoot_sound , bullets):
         if key[pygame.K_SPACE]:
-            self.bullets.append(bullet(self))
+            bullets.append(bullet(self))
             shoot_sound.play()
 
 
